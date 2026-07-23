@@ -464,6 +464,11 @@ footer a {
   place-items: center;
   background: rgb(15 11 28 / 78%);
   backdrop-filter: blur(0.5rem);
+  transition: background 160ms ease;
+}
+
+.welcome.is-celebrating {
+  background: rgb(15 11 28 / 88%);
 }
 
 .welcome__card {
@@ -489,6 +494,72 @@ footer a {
   display: block;
   margin-bottom: 0.75rem;
   font-size: 3rem;
+}
+
+.welcome-confetti {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.welcome-confetti__particle {
+  position: absolute;
+  opacity: 0;
+  animation: welcome-confetti-flight var(--duration)
+    cubic-bezier(0.15, 0.65, 0.35, 1) both;
+  will-change: transform, opacity;
+}
+
+.welcome-confetti__piece {
+  display: block;
+  background: currentcolor;
+  border-radius: 0.08rem;
+  box-shadow: 0 0.08rem 0.2rem rgb(23 19 38 / 15%);
+  animation: welcome-confetti-flutter var(--flutter-duration) ease-in-out
+    var(--flutter-delay) infinite alternate;
+  will-change: transform;
+}
+
+.welcome-confetti__particle--reduced {
+  opacity: 1;
+  animation: none;
+}
+
+.welcome-confetti__particle--reduced .welcome-confetti__piece {
+  animation: none;
+}
+
+@keyframes welcome-confetti-flight {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(0.75);
+  }
+
+  34% {
+    opacity: 1;
+    transform: translate(-50%, -50%)
+      translate3d(var(--launch-x), var(--launch-y), 0) scale(1);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.65, 1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%)
+      translate3d(var(--landing-x), var(--landing-y), 0) scale(0.82);
+  }
+}
+
+@keyframes welcome-confetti-flutter {
+  from {
+    transform: translateX(var(--flutter-x-negative))
+      rotate(var(--flutter-rotation-negative));
+  }
+
+  to {
+    transform: translateX(var(--flutter-x)) rotate(var(--flutter-rotation));
+  }
 }
 
 .toast {
