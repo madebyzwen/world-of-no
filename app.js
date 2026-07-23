@@ -1,6 +1,8 @@
 const DATA_URL = "./data/languages.json";
 const DUCKING_FACTOR = 0.2;
 const RANDOM_PLAYBACK_DELAY_MS = 500;
+const NO_CONFETTI_COUNT = 50;
+const NO_CONFETTI_MAX_DURATION_MS = 2250;
 
 const elements = {
   search: document.querySelector("#search"),
@@ -49,6 +51,79 @@ function showToast(message) {
   toastTimer = window.setTimeout(() => {
     elements.toast.hidden = true;
   }, 5000);
+}
+
+function playNoConfetti(originElement, word) {
+  const colors = ["#d72678", "#7452d6", "#ff5da7", "#a91659", "#171326"];
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const origin = originElement.getBoundingClientRect();
+  const originX = origin.left + origin.width / 2;
+  const originY = origin.top + origin.height / 2;
+  const layer = document.createElement("div");
+
+  layer.className = "no-confetti";
+  layer.setAttribute("aria-hidden", "true");
+  document.body.append(layer);
+
+  for (let index = 0; index < NO_CONFETTI_COUNT; index += 1) {
+    const particle = document.createElement("span");
+    const angleProgress = index / (NO_CONFETTI_COUNT - 1);
+    const angleJitter = (Math.random() - 0.5) * 4;
+    const angle = ((-140 + angleProgress * 100 + angleJitter) * Math.PI) / 180;
+    const velocityBand = index % 3;
+    const velocity = 170 + velocityBand * 50 + Math.random() * 30;
+    const launchX = Math.cos(angle) * velocity;
+    const launchY = Math.sin(angle) * velocity;
+    const landingX = launchX + (Math.random() - 0.5) * 100;
+    const landingY = Math.max(120, launchY + 360 + Math.random() * 160);
+    const flutterDistance = 5 + Math.random() * 9;
+    const flutterRotation = 8 + Math.random() * 14;
+    const flutterDuration = 320 + Math.random() * 240;
+    const duration = 1700 + Math.random() * 500;
+    const text = document.createElement("span");
+
+    particle.className = "no-confetti__particle";
+    text.className = "no-confetti__text";
+    text.textContent = word;
+    text.dir = "auto";
+    particle.style.left = `${originX}px`;
+    particle.style.top = `${originY}px`;
+    particle.style.color =
+      colors[Math.floor(Math.random() * colors.length)];
+    particle.style.fontSize = `${0.65 + Math.random() * 0.75}rem`;
+    particle.style.setProperty("--launch-x", `${launchX}px`);
+    particle.style.setProperty("--launch-y", `${launchY}px`);
+    particle.style.setProperty("--landing-x", `${landingX}px`);
+    particle.style.setProperty("--landing-y", `${landingY}px`);
+    particle.style.setProperty("--duration", `${duration}ms`);
+    particle.style.setProperty("--flutter-x", `${flutterDistance}px`);
+    particle.style.setProperty("--flutter-x-negative", `${-flutterDistance}px`);
+    particle.style.setProperty("--flutter-rotation", `${flutterRotation}deg`);
+    particle.style.setProperty(
+      "--flutter-rotation-negative",
+      `${-flutterRotation}deg`,
+    );
+    particle.style.setProperty("--flutter-duration", `${flutterDuration}ms`);
+    particle.style.setProperty(
+      "--flutter-delay",
+      `${-Math.random() * flutterDuration}ms`,
+    );
+
+    if (reducedMotion) {
+      particle.classList.add("no-confetti__particle--reduced");
+      particle.style.transform = `translate(-50%, -50%) translate3d(${launchX * 0.45}px, ${launchY * 0.4}px, 0)`;
+    }
+
+    particle.append(text);
+    layer.append(particle);
+  }
+
+  window.setTimeout(
+    () => layer.remove(),
+    reducedMotion ? 500 : NO_CONFETTI_MAX_DURATION_MS,
+  );
 }
 
 function updateMusicButton() {
@@ -123,6 +198,7 @@ function reportLanguageAudioError(playback, reason) {
 
 async function playLanguageAudio(language, card) {
   stopLanguagePlayback({ restoreMusic: false });
+  playNoConfetti(card.querySelector(".speak-button"), language.word);
 
   const audio = new Audio();
   audio.preload = "metadata";
@@ -143,7 +219,6 @@ async function playLanguageAudio(language, card) {
     () => reportLanguageAudioError(playback, "Loading aborted"),
     { once: true },
   );
-
   updatePlaybackCard(card, true);
   setDucking(true);
 
