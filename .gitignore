@@ -6,4 +6,5 @@
 .codex_info/
 __pycache__/
 *.py[cod]
+requirements-dev.txt
 assets/audio/languages/*.part
