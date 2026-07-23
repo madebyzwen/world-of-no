@@ -1,0 +1,6 @@
+# World of No — built by Sven Hüttmann
+
+User-agent: *
+Allow: /
+
+Sitemap: https://sound-of-no.com/sitemap.xml

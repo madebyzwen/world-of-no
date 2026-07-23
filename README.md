@@ -3,7 +3,7 @@
 A small, playful website that shows how to say “no” in 50 languages, complete
 with pre-generated audio and optional background music.
 
-Visit the live site: <https://madebyzwen.github.io/world-of-no/>
+Visit the live site: <https://sound-of-no.com/>
 
 ## Features
 
@@ -34,9 +34,13 @@ was produced.
 assets/audio/background-music.mp3     optional background music
 assets/audio/languages/<id>.mp3       fixed language audio
 assets/css/                            website and effect styles
+assets/favicon.svg                    browser icon
 assets/js/                             application and effect modules
 data/languages.json                   visible language data and audio paths
 dist/                                 generated upload-ready website
+robots.txt                            crawler access and sitemap reference
+sitemap.xml                           canonical page for search engines
+.htaccess                             optional Apache configuration
 .githooks/pre-commit                  automatic distribution build
 scripts/build-dist.sh                 distribution build script
 scripts/generate_audio.py             local MP3 generator

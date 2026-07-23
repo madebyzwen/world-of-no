@@ -26,6 +26,10 @@ mkdir -p \
   "$DIST_DIR/data"
 
 cp "$PROJECT_ROOT/index.html" "$DIST_DIR/index.html"
+cp "$PROJECT_ROOT/.htaccess" "$DIST_DIR/.htaccess"
+cp "$PROJECT_ROOT/robots.txt" "$DIST_DIR/robots.txt"
+cp "$PROJECT_ROOT/sitemap.xml" "$DIST_DIR/sitemap.xml"
+cp "$PROJECT_ROOT/assets/favicon.svg" "$DIST_DIR/assets/favicon.svg"
 cp "$PROJECT_ROOT/assets/css/styles.css" "$DIST_DIR/assets/css/styles.css"
 cp "$PROJECT_ROOT/assets/css/effects.css" "$DIST_DIR/assets/css/effects.css"
 cp "$PROJECT_ROOT/assets/js/app.js" "$DIST_DIR/assets/js/app.js"
