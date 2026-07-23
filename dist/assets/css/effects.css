@@ -1,0 +1,246 @@
+.random-button__die {
+  display: inline-block;
+  transform-origin: center;
+}
+
+.random-button.is-rolling .random-button__die {
+  animation: random-die-roll 480ms ease-in-out infinite;
+}
+
+.language-card.is-celebrating {
+  z-index: 95;
+  animation: playback-card-lift 1100ms ease-out both;
+}
+
+.language-card.is-celebrating .word {
+  animation: playback-word-pulse 650ms ease-out 160ms both;
+}
+
+.welcome {
+  transition: background 160ms ease;
+}
+
+.welcome.is-celebrating {
+  background: rgb(15 11 28 / 88%);
+}
+
+.welcome-confetti {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.welcome-confetti__particle {
+  position: absolute;
+  opacity: 0;
+  animation: welcome-confetti-flight var(--duration)
+    cubic-bezier(0.15, 0.65, 0.35, 1) both;
+  will-change: transform, opacity;
+}
+
+.welcome-confetti__piece {
+  display: block;
+  background: currentcolor;
+  border-radius: 0.08rem;
+  box-shadow: 0 0.08rem 0.2rem rgb(23 19 38 / 15%);
+  animation: welcome-confetti-flutter var(--flutter-duration) ease-in-out
+    var(--flutter-delay) infinite alternate;
+  will-change: transform;
+}
+
+.welcome-confetti__particle--reduced {
+  opacity: 1;
+  animation: none;
+}
+
+.welcome-confetti__particle--reduced .welcome-confetti__piece {
+  animation: none;
+}
+
+.no-confetti {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.playback-spotlight {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  background: #0f0b1c;
+  opacity: 0;
+  pointer-events: none;
+  animation: playback-spotlight 1100ms ease-out both;
+}
+
+.no-confetti__particle {
+  position: absolute;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0;
+  animation: no-confetti-burst var(--duration) cubic-bezier(0.15, 0.65, 0.35, 1)
+    both;
+  will-change: transform, opacity;
+}
+
+.no-confetti__text {
+  display: block;
+  text-shadow: 0 0.1rem 0.35rem rgb(23 19 38 / 18%);
+  animation: no-confetti-flutter var(--flutter-duration) ease-in-out
+    var(--flutter-delay) infinite alternate;
+  will-change: transform;
+}
+
+.no-confetti__particle--reduced {
+  opacity: 1;
+  animation: none;
+}
+
+.no-confetti__particle--reduced .no-confetti__text {
+  animation: none;
+}
+
+@keyframes random-die-roll {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+
+  25% {
+    transform: translateY(-0.32rem) rotate(90deg) scale(1.3);
+  }
+
+  50% {
+    transform: translateY(0) rotate(180deg) scale(1);
+  }
+
+  75% {
+    transform: translateY(-0.22rem) rotate(270deg) scale(1.2);
+  }
+
+  100% {
+    transform: translateY(0) rotate(360deg) scale(1);
+  }
+}
+
+@keyframes welcome-confetti-flight {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(0.75);
+  }
+
+  34% {
+    opacity: 1;
+    transform: translate(-50%, -50%)
+      translate3d(var(--launch-x), var(--launch-y), 0) scale(1);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.65, 1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%)
+      translate3d(var(--landing-x), var(--landing-y), 0) scale(0.82);
+  }
+}
+
+@keyframes welcome-confetti-flutter {
+  from {
+    transform: translateX(var(--flutter-x-negative))
+      rotate(var(--flutter-rotation-negative));
+  }
+
+  to {
+    transform: translateX(var(--flutter-x)) rotate(var(--flutter-rotation));
+  }
+}
+
+@keyframes no-confetti-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(0.6);
+  }
+
+  6% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(1);
+    animation-timing-function: cubic-bezier(0.12, 0.7, 0.2, 1);
+  }
+
+  28% {
+    opacity: 1;
+    transform: translate(-50%, -50%)
+      translate3d(var(--launch-x), var(--launch-y), 0) scale(1);
+    animation-timing-function: linear;
+  }
+
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -50%)
+      translate3d(var(--launch-x), var(--launch-y), 0) scale(1);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.65, 1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%)
+      translate3d(var(--landing-x), var(--landing-y), 0) scale(0.85);
+  }
+}
+
+@keyframes no-confetti-flutter {
+  from {
+    transform: translateX(var(--flutter-x-negative))
+      rotate(var(--flutter-rotation-negative));
+  }
+
+  to {
+    transform: translateX(var(--flutter-x)) rotate(var(--flutter-rotation));
+  }
+}
+
+@keyframes playback-spotlight {
+  0% {
+    opacity: 0;
+  }
+
+  14%,
+  50% {
+    opacity: 0.14;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes playback-card-lift {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  16%,
+  55% {
+    border-color: var(--accent);
+    box-shadow:
+      0 0 0 0.25rem rgb(215 38 120 / 24%),
+      0 1.2rem 2.8rem rgb(23 19 38 / 22%);
+    transform: translateY(-0.35rem) scale(1.02);
+  }
+}
+
+@keyframes playback-word-pulse {
+  0%,
+  100% {
+    color: var(--ink);
+    transform: scale(1);
+  }
+
+  45% {
+    color: var(--accent);
+    transform: scale(1.08);
+  }
+}

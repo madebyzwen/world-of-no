@@ -33,7 +33,12 @@ was produced.
 ```text
 assets/audio/background-music.mp3     optional background music
 assets/audio/languages/<id>.mp3       fixed language audio
+assets/css/                            website and effect styles
+assets/js/                             application and effect modules
 data/languages.json                   visible language data and audio paths
+dist/                                 generated upload-ready website
+.githooks/pre-commit                  automatic distribution build
+scripts/build-dist.sh                 distribution build script
 scripts/generate_audio.py             local MP3 generator
 scripts/tts-config.json               provider, model, and voice configuration
 requirements-dev.txt                  local Python dependency
@@ -49,6 +54,26 @@ python3 -m http.server 8080
 ```
 
 Then open <http://localhost:8080>.
+
+## Build the upload package
+
+Every commit rebuilds `dist/` automatically. Existing files inside `dist/` are
+removed first, then only the files required by the static website are copied
+into it. The hook also stages the generated result so it is included in the
+commit.
+
+The repository uses a versioned Git hook from `.githooks/`. After cloning,
+activate it once:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+The same build can be run manually:
+
+```bash
+./scripts/build-dist.sh
+```
 
 ## Language data
 
