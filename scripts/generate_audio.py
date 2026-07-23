@@ -31,7 +31,7 @@ class Job:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Erzeugt feste MP3-Dateien für World of No."
+        description="Erzeugt feste MP3-Dateien für Sound of No."
     )
     parser.add_argument("--id", help="Nur die Sprache mit dieser stabilen ID erzeugen.")
     parser.add_argument(
@@ -146,7 +146,7 @@ def build_jobs(
     if not isinstance(model, str) or not model:
         raise ValueError("Das TTS-Modell fehlt in der Konfiguration.")
     if response_format != "mp3":
-        raise ValueError("World of No erwartet responseFormat=mp3.")
+        raise ValueError("Sound of No erwartet responseFormat=mp3.")
     if not isinstance(default_voice, str) or not default_voice:
         raise ValueError("defaultVoice fehlt in der TTS-Konfiguration.")
     if not isinstance(default_speed, (int, float)) or not 0.25 <= default_speed <= 4:

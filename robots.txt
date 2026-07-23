@@ -1,4 +1,4 @@
-# World of No — built by Sven Hüttmann
+# Sound of No — built by Sven Hüttmann
 
 User-agent: *
 Allow: /

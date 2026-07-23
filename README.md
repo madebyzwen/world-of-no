@@ -1,4 +1,4 @@
-# World of No
+# Sound of No
 
 A small, playful website that shows how to say “no” in 50 languages, complete
 with pre-generated audio and optional background music.
