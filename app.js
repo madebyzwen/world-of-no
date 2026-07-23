@@ -2,6 +2,7 @@ const DATA_URL = "./data/languages.json";
 const DUCKING_FACTOR = 0.2;
 const RANDOM_POST_SCROLL_DELAY_MS = 250;
 const RANDOM_SCROLL_TIMEOUT_MS = 2500;
+const RANDOM_DIE_LEAD_MS = 700;
 const NO_CONFETTI_COUNT = 50;
 const NO_CONFETTI_MAX_DURATION_MS = 2250;
 const PLAYBACK_SPOTLIGHT_LEAD_MS = 160;
@@ -89,6 +90,11 @@ function showToast(message) {
   toastTimer = window.setTimeout(() => {
     elements.toast.hidden = true;
   }, 5000);
+}
+
+function setRandomButtonRolling(isRolling) {
+  elements.randomButton.classList.toggle("is-rolling", isRolling);
+  elements.randomButton.setAttribute("aria-busy", String(isRolling));
 }
 
 function playNoConfetti(originElement, word) {
@@ -338,6 +344,7 @@ function createCard(language) {
   speakButton.querySelector(".visually-hidden").textContent = accessibleLabel;
   speakButton.addEventListener("click", () => {
     randomSelectionToken += 1;
+    setRandomButtonRolling(false);
     document
       .querySelector(".language-card.is-highlighted")
       ?.classList.remove("is-highlighted");
@@ -413,39 +420,51 @@ function populateContinents() {
 
 async function selectRandomLanguage() {
   if (filteredLanguages.length === 0) {
+    setRandomButtonRolling(false);
     showToast("No languages match the current filters.");
     return;
   }
 
   const selectionToken = ++randomSelectionToken;
-  document
-    .querySelector(".language-card.is-highlighted")
-    ?.classList.remove("is-highlighted");
-  const language =
-    filteredLanguages[Math.floor(Math.random() * filteredLanguages.length)];
-  const card = document.querySelector(
-    `.language-card[data-id="${CSS.escape(language.id)}"]`,
-  );
-  card.classList.add("is-highlighted");
-  card.focus({ preventScroll: true });
-  card.scrollIntoView({ behavior: "smooth", block: "center" });
-  await waitForScrollEnd();
-  await wait(RANDOM_POST_SCROLL_DELAY_MS);
+  setRandomButtonRolling(true);
 
-  if (
-    selectionToken !== randomSelectionToken ||
-    document.activeElement !== card
-  ) {
+  try {
+    await wait(RANDOM_DIE_LEAD_MS);
     if (selectionToken !== randomSelectionToken) return;
-    console.error("Random selection could not set focus.", {
-      id: language.id,
-      language: language.language,
-    });
-    showToast("The selected language could not be focused.");
-    return;
-  }
 
-  playLanguageAudio(language, card);
+    document
+      .querySelector(".language-card.is-highlighted")
+      ?.classList.remove("is-highlighted");
+    const language =
+      filteredLanguages[Math.floor(Math.random() * filteredLanguages.length)];
+    const card = document.querySelector(
+      `.language-card[data-id="${CSS.escape(language.id)}"]`,
+    );
+    card.classList.add("is-highlighted");
+    card.focus({ preventScroll: true });
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    await waitForScrollEnd();
+    await wait(RANDOM_POST_SCROLL_DELAY_MS);
+
+    if (
+      selectionToken !== randomSelectionToken ||
+      document.activeElement !== card
+    ) {
+      if (selectionToken !== randomSelectionToken) return;
+      console.error("Random selection could not set focus.", {
+        id: language.id,
+        language: language.language,
+      });
+      showToast("The selected language could not be focused.");
+      return;
+    }
+
+    playLanguageAudio(language, card);
+  } finally {
+    if (selectionToken === randomSelectionToken) {
+      setRandomButtonRolling(false);
+    }
+  }
 }
 
 function validateData(data) {
