@@ -37,7 +37,7 @@ const normalize = (value) =>
   String(value ?? "")
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
-    .toLocaleLowerCase("de");
+    .toLocaleLowerCase("en");
 
 const wait = (milliseconds) =>
   new Promise((resolve) => window.setTimeout(resolve, milliseconds));
@@ -54,7 +54,9 @@ function showToast(message) {
 function updateMusicButton() {
   const isPlaying = !elements.music.paused;
   elements.musicIcon.textContent = isPlaying ? "⏸" : "▶";
-  elements.musicLabel.textContent = isPlaying ? "Musik pausieren" : "Musik starten";
+  elements.musicLabel.textContent = isPlaying
+    ? "Pause music"
+    : "Play music";
 }
 
 async function playMusic() {
@@ -62,7 +64,7 @@ async function playMusic() {
     await elements.music.play();
     elements.musicStatus.textContent = "";
   } catch {
-    elements.musicStatus.textContent = "Optionale Musikdatei nicht gefunden.";
+    elements.musicStatus.textContent = "Optional music file not found.";
   }
   updateMusicButton();
 }
@@ -106,14 +108,16 @@ function finishLanguagePlayback(playback) {
 function reportLanguageAudioError(playback, reason) {
   if (activeLanguagePlayback !== playback) return;
   const mediaError = playback.audio.error;
-  console.error("Sprachaudio konnte nicht wiedergegeben werden.", {
+  console.error("Language audio could not be played.", {
     id: playback.language.id,
     language: playback.language.language,
     source: playback.language.audio,
     mediaErrorCode: mediaError?.code ?? null,
     reason,
   });
-  showToast(`Die Audiodatei für ${playback.language.language} fehlt oder ist defekt.`);
+  showToast(
+    `The audio file for ${playback.language.language} is missing or damaged.`,
+  );
   finishLanguagePlayback(playback);
 }
 
@@ -147,13 +151,15 @@ async function playLanguageAudio(language, card) {
     await audio.play();
   } catch (error) {
     if (activeLanguagePlayback !== playback) return;
-    console.error("Sprachaudio konnte nicht gestartet werden.", {
+    console.error("Language audio could not be started.", {
       id: language.id,
       language: language.language,
       source: language.audio,
       error,
     });
-    showToast(`Die Audiodatei für ${language.language} konnte nicht gestartet werden.`);
+    showToast(
+      `The audio file for ${language.language} could not be started.`,
+    );
     finishLanguagePlayback(playback);
   }
 }
@@ -169,7 +175,7 @@ function createCard(language) {
 
   const transliteration = card.querySelector(".transliteration");
   transliteration.textContent = language.transliteration
-    ? `Umschrift: ${language.transliteration}`
+    ? `Transliteration: ${language.transliteration}`
     : "";
   transliteration.hidden = !language.transliteration;
 
@@ -178,7 +184,7 @@ function createCard(language) {
   note.hidden = !language.note;
 
   const speakButton = card.querySelector(".speak-button");
-  const accessibleLabel = `„${language.word}“ auf ${language.language} vorlesen`;
+  const accessibleLabel = `Play “${language.word}” in ${language.language}`;
   speakButton.setAttribute("aria-label", accessibleLabel);
   speakButton.setAttribute("aria-pressed", "false");
   speakButton.querySelector(".visually-hidden").textContent = accessibleLabel;
@@ -209,10 +215,12 @@ function render() {
   elements.officialCount.textContent = String(official.length);
   elements.officialCount.setAttribute(
     "aria-label",
-    `${official.length} sichtbare reguläre Sprachen`,
+    `${official.length} visible official languages`,
   );
   elements.bonusCount.textContent = String(bonus.length);
-  elements.resultCount.textContent = `${filteredLanguages.length} Treffer`;
+  elements.resultCount.textContent = `${filteredLanguages.length} ${
+    filteredLanguages.length === 1 ? "result" : "results"
+  }`;
   elements.extrasSection.hidden = bonus.length === 0;
   elements.emptyState.hidden = filteredLanguages.length !== 0;
 }
@@ -242,7 +250,7 @@ function applyFilters() {
 
 function populateContinents() {
   const continents = [...new Set(languages.map((item) => item.continent))].sort(
-    (a, b) => a.localeCompare(b, "de"),
+    (a, b) => a.localeCompare(b, "en"),
   );
   continents.forEach((continent) => {
     const option = document.createElement("option");
@@ -254,7 +262,7 @@ function populateContinents() {
 
 async function selectRandomLanguage() {
   if (filteredLanguages.length === 0) {
-    showToast("Unter den aktuellen Filtern gibt es kein zufälliges Nein.");
+    showToast("No languages match the current filters.");
     return;
   }
 
@@ -277,11 +285,11 @@ async function selectRandomLanguage() {
     document.activeElement !== card
   ) {
     if (selectionToken !== randomSelectionToken) return;
-    console.error("Zufallsauswahl konnte den Fokus nicht setzen.", {
+    console.error("Random selection could not set focus.", {
       id: language.id,
       language: language.language,
     });
-    showToast("Die zufällige Sprache konnte nicht fokussiert werden.");
+    showToast("The selected language could not be focused.");
     return;
   }
 
@@ -289,7 +297,7 @@ async function selectRandomLanguage() {
 }
 
 function validateData(data) {
-  if (!Array.isArray(data)) throw new Error("Die Sprachdaten sind keine Liste.");
+  if (!Array.isArray(data)) throw new Error("The language data is not a list.");
   const required = [
     "id",
     "language",
@@ -304,21 +312,23 @@ function validateData(data) {
 
   data.forEach((entry) => {
     if (required.some((field) => !String(entry[field] ?? "").trim())) {
-      throw new Error(`Unvollständiger Spracheintrag: ${entry.id || "ohne ID"}`);
+      throw new Error(
+        `Incomplete language entry: ${entry.id || "without ID"}`,
+      );
     }
     if (!["official", "bonus"].includes(entry.category)) {
-      throw new Error(`Ungültige Kategorie bei ${entry.id}.`);
+      throw new Error(`Invalid category for ${entry.id}.`);
     }
     const expectedAudioPath = `assets/audio/languages/${entry.id}.mp3`;
     if (entry.audio !== expectedAudioPath) {
-      throw new Error(`Ungültiger Audiopfad bei ${entry.id}.`);
+      throw new Error(`Invalid audio path for ${entry.id}.`);
     }
-    if (ids.has(entry.id)) throw new Error(`Doppelte ID: ${entry.id}`);
+    if (ids.has(entry.id)) throw new Error(`Duplicate ID: ${entry.id}`);
     ids.add(entry.id);
   });
 
   if (data.filter((entry) => entry.category === "official").length !== 50) {
-    throw new Error("Es müssen genau 50 reguläre Sprachen vorhanden sein.");
+    throw new Error("There must be exactly 50 official languages.");
   }
 }
 
@@ -334,9 +344,9 @@ async function initialize() {
     render();
   } catch (error) {
     elements.officialList.innerHTML =
-      '<p class="error-message">Die Sprachdaten konnten nicht geladen werden. Bitte starte die Seite über einen lokalen Webserver.</p>';
-    elements.resultCount.textContent = "Ladefehler";
-    console.error("Sprachdaten konnten nicht geladen werden:", error);
+      '<p class="error-message">The language data could not be loaded. Please run the site through a local web server.</p>';
+    elements.resultCount.textContent = "Loading error";
+    console.error("Language data could not be loaded:", error);
   }
 }
 
@@ -379,7 +389,7 @@ elements.volume.addEventListener("input", () => {
 });
 
 elements.music.addEventListener("error", () => {
-  elements.musicStatus.textContent = "Optionale Musikdatei nicht gefunden.";
+  elements.musicStatus.textContent = "Optional music file not found.";
   updateMusicButton();
 });
 elements.music.addEventListener("play", updateMusicButton);

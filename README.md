@@ -1,80 +1,83 @@
 # World of No
 
-Eine kleine, humorvolle Webseite, die zeigt, wie man in 50 Sprachen „Nein“
-sagt – mit festen Audiodateien und optionaler Hintergrundmusik.
+A small, playful website that shows how to say “no” in 50 languages, complete
+with pre-generated audio and optional background music.
 
-## Funktionen
+Visit the live site: <https://madebyzwen.github.io/world-of-no/>
 
-- exakt 50 reguläre Sprachen und ein separater Bonusbereich „Extras“
-- gemeinsame Suche und Kontinentfilter
-- Zufallsauswahl mit Fokus, Hervorhebung und MP3-Wiedergabe nach 500 ms
-- feste MP3-Datei für jede Sprache
-- keine überlappenden Sprachdateien, auch bei schnellen Klicks
-- verständliche Meldung bei fehlenden oder defekten Dateien
-- optionale Hintergrundmusik mit Startdialog, Pause und Lautstärke
-- automatisches Audio-Ducking während einer Sprachdatei
-- responsive und tastaturbedienbare Oberfläche
-- statisches Deployment über GitHub Pages
+## Features
 
-## Architektur
+- exactly 50 official languages and a separate “Extras” section
+- shared search and continent filter
+- random selection with focus, highlighting, and MP3 playback after 500 ms
+- a fixed MP3 file for every language
+- no overlapping language audio, even after rapid clicks
+- clear feedback for missing or damaged audio files
+- optional background music with a welcome dialog, pause control, and volume
+- automatic music ducking while language audio is playing
+- responsive, keyboard-accessible interface
+- static deployment through GitHub Pages
 
-Die öffentliche Website verwendet ausschließlich HTML5, CSS3, modernes Vanilla
-JavaScript, JSON und statische MP3-Dateien. Sie enthält keine Web Speech API,
-keine TTS-Anfragen, keinen API-Schlüssel, kein Backend und kein Tracking.
+## Architecture
 
-Die Sprachdateien werden vorab im Entwicklungsprozess erzeugt oder manuell
-bereitgestellt. Das Frontend spielt ausschließlich den in den Sprachdaten
-konfigurierten Pfad ab und kennt den Erzeugungsweg nicht.
+The public website uses only HTML5, CSS3, modern Vanilla JavaScript, JSON, and
+static MP3 files. It contains no Web Speech API, runtime TTS requests, API keys,
+backend, database, tracking, or analytics.
 
-## Verzeichnisstruktur
+Language audio is generated or recorded ahead of time. The frontend only plays
+the static path configured in the language data and does not know how a file
+was produced.
+
+## Project structure
 
 ```text
-assets/audio/background-music.mp3     optionale Hintergrundmusik
-assets/audio/languages/<id>.mp3       feste Sprachdateien
-data/languages.json                   sichtbare Sprach- und Audiopfade
-scripts/generate_audio.py             lokaler MP3-Generator
-scripts/tts-config.json               Anbieter-, Modell- und Stimmenkonfiguration
-requirements-dev.txt                  nur lokal benötigte Python-Abhängigkeit
+assets/audio/background-music.mp3     optional background music
+assets/audio/languages/<id>.mp3       fixed language audio
+data/languages.json                   visible language data and audio paths
+scripts/generate_audio.py             local MP3 generator
+scripts/tts-config.json               provider, model, and voice configuration
+requirements-dev.txt                  local Python dependency
 ```
 
-## Lokal starten
+## Run locally
 
-Da die Sprachdaten per `fetch` geladen werden, wird ein lokaler Webserver
-benötigt:
+The language data is loaded with `fetch`, so the project must be served through
+a local web server:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Danach ist die Seite unter <http://localhost:8080> erreichbar.
+Then open <http://localhost:8080>.
 
-## Sprachdaten
+## Language data
 
-Die Einträge liegen in [`data/languages.json`](data/languages.json). Reguläre
-Einträge verwenden `category: "official"`; Spaß- oder Fantasiesprachen
-verwenden `category: "bonus"`.
+Entries live in [`data/languages.json`](data/languages.json). Regular entries
+use `category: "official"`; fun or fictional languages use
+`category: "bonus"`.
 
-Ein verkürztes Beispiel:
+A shortened example:
 
 ```json
 {
   "id": "is",
   "audio": "assets/audio/languages/is.mp3",
-  "language": "Isländisch",
+  "language": "Icelandic",
   "word": "Nei",
   "locale": "is-IS",
   "category": "official"
 }
 ```
 
-`id` und `audio` bleiben stabil, auch wenn sichtbare Texte geändert werden.
-Optional kann `ttsText` eine für die Erzeugung optimierte Aussprache enthalten.
+The `id` and `audio` values remain stable when visible text changes. An
+optional `ttsText` value can provide pronunciation-friendly input for audio
+generation.
 
-## Sprachdateien erzeugen
+## Generate language audio
 
-Vorbereitet ist die OpenAI Speech API mit dem Qualitätsmodell `tts-1-hd` und
-der Standardstimme `coral`. Die Abhängigkeit wird nur für das lokale
-Entwicklungsskript benötigt. Erforderlich ist Python 3.9 oder neuer:
+The development script is configured for the OpenAI Speech API, using
+`tts-1-hd` and the default voice `coral`. This dependency is only needed for
+local development. Python 3.9 or later is required:
 
 ```bash
 python3 -m venv .venv
@@ -82,113 +85,113 @@ source .venv/bin/activate
 python3 -m pip install -r requirements-dev.txt
 ```
 
-Unter PowerShell wird die Umgebung mit `.venv\Scripts\Activate.ps1` aktiviert.
+In PowerShell, activate the environment with
+`.venv\Scripts\Activate.ps1`.
 
-Der API-Schlüssel wird ausschließlich über die Umgebungsvariable
-`OPENAI_API_KEY` gelesen:
+The API key is read exclusively from the `OPENAI_API_KEY` environment
+variable:
 
 ```bash
 export OPENAI_API_KEY="..."
 ```
 
-Alle fehlenden Sprachdateien erzeugen:
+Generate all missing files:
 
 ```bash
 python3 scripts/generate_audio.py
 ```
 
-Eine einzelne Sprache anhand ihrer stabilen ID erzeugen:
+Generate one language by its stable ID:
 
 ```bash
 python3 scripts/generate_audio.py --id is
 ```
 
-Auswahl und Konfiguration ohne API-Aufruf prüfen:
+Check selection and configuration without making an API request:
 
 ```bash
 python3 scripts/generate_audio.py --dry-run
 ```
 
-Vorhandene Dateien werden standardmäßig übersprungen. Explizit überschreiben:
+Existing files are skipped by default. To overwrite them explicitly:
 
 ```bash
 python3 scripts/generate_audio.py --overwrite
 ```
 
-Als manuell bevorzugt markierte Sonderdateien bleiben selbst dabei geschützt.
-Sie werden nur mit beiden Optionen überschrieben:
+Manually preferred special cases remain protected. They are only overwritten
+when both options are present:
 
 ```bash
 python3 scripts/generate_audio.py --overwrite --overwrite-manual
 ```
 
-Das Skript erstellt Zielverzeichnisse automatisch, verarbeitet nach einem
-Einzelfehler die übrigen Sprachen weiter und zeigt anschließend eine
-Zusammenfassung. Partielle Downloads werden nicht als fertige MP3 übernommen.
-Die TTS-Konfiguration begrenzt den Lauf auf eine Anfrage alle 21 Sekunden und
-wiederholt HTTP-429-Fehler automatisch. Damit funktioniert die Erzeugung auch
-mit einem niedrigen Limit von drei Anfragen pro Minute; ein vollständiger Lauf
-dauert entsprechend ungefähr 18 Minuten. Die automatischen SDK-Retries sind
-deaktiviert, damit jeder sichtbare Versuch tatsächlich nur eine API-Anfrage
-verbraucht.
+The script creates target directories, continues after individual failures,
+and ends with a summary. Partial downloads never become finished MP3 files.
+The TTS configuration spaces requests 21 seconds apart and automatically
+retries HTTP 429 errors. This supports a low limit of three requests per minute,
+so a complete run takes roughly 18 minutes. Automatic SDK retries are disabled
+to ensure that each visible attempt represents only one API request.
 
-## Manuelle Aufnahmen
+## Manual recordings
 
-Jede MP3 kann am konfigurierten Pfad ersetzt werden. Eine hochwertige Aufnahme
-für Klingonisch liegt beispielsweise unter:
+Any MP3 can be replaced at its configured path. Klingon lives at:
 
 ```text
 assets/audio/languages/tlh.mp3
 ```
 
-Der normale Generatorlauf überspringt vorhandene Dateien. Klingonisch ist in
-[`scripts/tts-config.json`](scripts/tts-config.json) zusätzlich als
-`manualPreferred` markiert und besitzt eine dokumentierte Ersatzstimme und
-phonetische Eingabe. Eine native Klingonisch-Stimme wird nicht vorgetäuscht.
+The regular generator skips existing files. Klingon is additionally marked as
+`manualPreferred` in
+[`scripts/tts-config.json`](scripts/tts-config.json), with a documented
+fallback voice and phonetic input. The project does not pretend that this is a
+native Klingon voice.
 
-## Eine Sprache aktualisieren
+## Update a language
 
-1. Sichtbare Daten, Locale und gegebenenfalls `ttsText` in
-   `data/languages.json` prüfen.
-2. Audiopfad und optionale Sonderkonfiguration in `scripts/tts-config.json`
-   prüfen.
-3. Datei mit `--id <id> --overwrite` neu erzeugen oder manuell ersetzen.
-4. Aussprache anhören und möglichst von einer sprachkundigen Person prüfen.
-5. Die fertige MP3 zusammen mit den statischen Website-Dateien versionieren.
+1. Review the visible data, locale, and optional `ttsText` in
+   `data/languages.json`.
+2. Review the audio path and any special configuration in
+   `scripts/tts-config.json`.
+3. Regenerate with `--id <id> --overwrite`, or replace the file manually.
+4. Listen to the pronunciation and, where possible, ask a fluent speaker to
+   review it.
+5. Version the finished MP3 together with the static website files.
 
-## Bekannte Einschränkungen
+## Known limitations
 
-- OpenAI-Stimmen sind mehrsprachig, aber keine garantiert muttersprachlichen
-  Stimmen für jedes Locale.
-- Irisch, Walisisch, Mandarin und Thailändisch verwenden kontextabhängige
-  Verneinungen.
-- Klingonisch wird nicht nativ unterstützt; die Generatorausgabe ist nur eine
-  Annäherung und sollte möglichst manuell ersetzt werden.
-- Die Audiodateien können KI-generierte Stimmen enthalten.
+- The OpenAI voices are multilingual, but they are not guaranteed to sound
+  native for every locale.
+- Irish, Welsh, Mandarin, and Thai use context-dependent forms of negation.
+- Klingon is not natively supported; generated audio is only an approximation
+  and should ideally be replaced with a manual recording.
+- Audio files may contain AI-generated voices.
 
-## Fehlerverhalten
+## Error handling
 
-Fehlt eine Sprachdatei oder ist sie nicht abspielbar, erscheint eine
-unaufdringliche Meldung und die Browserkonsole enthält ID, Pfad und Fehlercode.
-Die Hintergrundmusik wird auch in diesem Fall wieder auf die zuvor gewählte
-Lautstärke angehoben.
+If a language file is missing or cannot be played, the interface shows a quiet
+notification and the browser console reports its ID, path, and error code.
+Background music returns to the selected volume even after an audio failure.
 
-Die optionale Hintergrundmusik wird hier erwartet:
+Optional background music is expected at:
 
 ```text
 assets/audio/background-music.mp3
 ```
 
-Die Seite funktioniert ohne diese Datei.
+The site remains fully functional without this file.
 
 ## GitHub Pages
 
-Der Workflow [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml)
-veröffentlicht die statischen Dateien bei Pushes auf `main` oder nach manuellem
-Start. In den Repository-Einstellungen muss GitHub Pages einmalig als Quelle
-„GitHub Actions“ erhalten. Die erzeugten MP3-Dateien müssen vor dem Deployment
-im Repository vorhanden sein.
+The [deployment workflow](.github/workflows/deploy-pages.yml) publishes the
+static files after pushes to `main` or a manual run. GitHub Pages uses GitHub
+Actions as its publishing source.
 
-## Lizenz
+## Support
 
-Der Quellcode steht unter der [MIT-Lizenz](LICENSE).
+If this tiny world tour made you smile, you can
+[buy me a coffee](https://buymeacoffee.com/madebyzwen).
+
+## License
+
+The source code is available under the [MIT License](LICENSE).
