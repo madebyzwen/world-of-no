@@ -1,0 +1,27 @@
+{
+  "provider": "openai",
+  "model": "tts-1-hd",
+  "responseFormat": "mp3",
+  "defaultVoice": "coral",
+  "defaultSpeed": 0.9,
+  "requestIntervalSeconds": 21,
+  "maxRateLimitRetries": 5,
+  "languageOverrides": {
+    "zh": {
+      "speed": 0.85
+    },
+    "ja": {
+      "speed": 0.85
+    },
+    "th": {
+      "speed": 0.85
+    },
+    "tlh": {
+      "voice": "onyx",
+      "ttsText": "goh-BEH",
+      "speed": 0.8,
+      "manualPreferred": true,
+      "note": "Klingonisch wird nicht nativ unterstützt; eine manuelle Aufnahme ist vorzuziehen."
+    }
+  }
+}

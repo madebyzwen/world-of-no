@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Entdecke, wie man in 50 Sprachen Nein sagt – auf Wunsch sogar vorgelesen."
+    >
+    <title>World of No – Nein auf 50 Sprachen</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./app.js" type="module"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#languages" inert>Zu den Sprachen springen</a>
+
+    <header class="hero" inert>
+      <div class="hero__inner">
+        <p class="eyebrow">Eine kleine Weltreise in zwei Buchstaben</p>
+        <h1>World of <span>No</span></h1>
+        <p class="hero__text">
+          50 freundliche Wege, eine klare Grenze zu setzen. Ohne Diskussion.
+        </p>
+        <button class="random-button" id="random-button" type="button">
+          <span aria-hidden="true">🎲</span>
+          Zufälliges Nein
+        </button>
+      </div>
+    </header>
+
+    <main id="languages" inert>
+      <section class="toolbar" aria-label="Sprachen suchen und filtern">
+        <div class="field">
+          <label for="search">Suche</label>
+          <input
+            id="search"
+            type="search"
+            placeholder="Sprache oder Nein suchen …"
+            autocomplete="off"
+          >
+        </div>
+        <div class="field">
+          <label for="continent-filter">Kontinent</label>
+          <select id="continent-filter">
+            <option value="all">Alle Kontinente</option>
+          </select>
+        </div>
+        <p class="result-count" id="result-count" aria-live="polite"></p>
+      </section>
+
+      <section class="language-section" aria-labelledby="official-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow eyebrow--dark">Die offizielle Sammlung</p>
+            <h2 id="official-heading">50 Sprachen, 50 Neins</h2>
+          </div>
+          <span class="count-badge" id="official-count" aria-label="50 reguläre Sprachen">50</span>
+        </div>
+        <div class="language-grid" id="official-list"></div>
+      </section>
+
+      <section
+        class="language-section extras"
+        id="extras-section"
+        aria-labelledby="extras-heading"
+        hidden
+      >
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow eyebrow--dark">Weil die Galaxie groß ist</p>
+            <h2 id="extras-heading">Extras</h2>
+          </div>
+          <span class="count-badge count-badge--bonus" id="bonus-count"></span>
+        </div>
+        <div class="language-grid" id="bonus-list"></div>
+      </section>
+
+      <p class="empty-state" id="empty-state" hidden>
+        Dazu fällt selbst uns kein Nein ein. Versuch eine andere Suche.
+      </p>
+
+      <noscript>
+        <p class="error-message">
+          Für Suche, Filter und Sprachausgabe muss JavaScript aktiviert sein.
+        </p>
+      </noscript>
+    </main>
+
+    <aside class="music-controls" aria-label="Hintergrundmusik" inert>
+      <button id="music-toggle" class="icon-button" type="button" disabled>
+        <span id="music-icon" aria-hidden="true">▶</span>
+        <span id="music-label">Musik starten</span>
+      </button>
+      <label for="volume">
+        Lautstärke
+        <input id="volume" type="range" min="0" max="1" step="0.05" value="0.25">
+      </label>
+      <span class="music-status" id="music-status" aria-live="polite"></span>
+    </aside>
+
+    <footer inert>
+      <p>Mit einem Augenzwinkern und sehr vielen klaren Grenzen.</p>
+      <p>Die Audiodateien können KI-generierte Stimmen enthalten.</p>
+      <a href="https://github.com/madebyzwen/world-of-no">Open Source auf GitHub</a>
+    </footer>
+
+    <div
+      class="welcome"
+      id="welcome"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="welcome-title"
+      aria-describedby="welcome-description"
+    >
+      <div class="welcome__card">
+        <span class="welcome__globe" aria-hidden="true">🌍</span>
+        <p class="eyebrow eyebrow--dark">Bereit für klare Worte?</p>
+        <h2 id="welcome-title">Willkommen in der World of No</h2>
+        <p id="welcome-description">
+          Starte die Reise. Falls die optionale Musikdatei vorhanden ist,
+          begleitet sie dich ganz leise.
+        </p>
+        <button id="enter-button" class="primary-button" type="button">
+          Los geht’s
+        </button>
+      </div>
+    </div>
+
+    <template id="language-card-template">
+      <article class="language-card">
+        <div class="card__top">
+          <span class="flag" aria-hidden="true"></span>
+          <button class="speak-button" type="button">
+            <span aria-hidden="true">🔊</span>
+            <span class="visually-hidden"></span>
+          </button>
+        </div>
+        <h3 class="language-name"></h3>
+        <p class="native-name"></p>
+        <p class="word"></p>
+        <p class="transliteration"></p>
+        <p class="note"></p>
+      </article>
+    </template>
+
+    <audio id="background-music" src="./assets/audio/background-music.mp3" loop preload="none"></audio>
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>
