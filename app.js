@@ -4,6 +4,8 @@ const RANDOM_POST_SCROLL_DELAY_MS = 250;
 const RANDOM_SCROLL_TIMEOUT_MS = 2500;
 const NO_CONFETTI_COUNT = 50;
 const NO_CONFETTI_MAX_DURATION_MS = 2250;
+const PLAYBACK_SPOTLIGHT_LEAD_MS = 160;
+const PLAYBACK_SPOTLIGHT_DURATION_MS = 1100;
 
 const elements = {
   search: document.querySelector("#search"),
@@ -35,6 +37,7 @@ let randomSelectionToken = 0;
 let selectedVolume = Number(elements.volume.value);
 let isDucking = false;
 let toastTimer;
+let playbackMomentTimers = [];
 
 const normalize = (value) =>
   String(value ?? "")
@@ -161,6 +164,41 @@ function playNoConfetti(originElement, word) {
   );
 }
 
+function clearPlaybackMoment() {
+  playbackMomentTimers.forEach((timer) => window.clearTimeout(timer));
+  playbackMomentTimers = [];
+  document.querySelector(".playback-spotlight")?.remove();
+  document
+    .querySelector(".language-card.is-celebrating")
+    ?.classList.remove("is-celebrating");
+  document.querySelectorAll(".no-confetti").forEach((layer) => layer.remove());
+}
+
+function playPlaybackMoment(card, word) {
+  clearPlaybackMoment();
+
+  const spotlight = document.createElement("div");
+  spotlight.className = "playback-spotlight";
+  spotlight.setAttribute("aria-hidden", "true");
+  document.body.append(spotlight);
+
+  // Restart the card and word animations when the same language is replayed.
+  void card.offsetWidth;
+  card.classList.add("is-celebrating");
+
+  playbackMomentTimers = [
+    window.setTimeout(
+      () => playNoConfetti(card.querySelector(".speak-button"), word),
+      PLAYBACK_SPOTLIGHT_LEAD_MS,
+    ),
+    window.setTimeout(() => {
+      spotlight.remove();
+      card.classList.remove("is-celebrating");
+      playbackMomentTimers = [];
+    }, PLAYBACK_SPOTLIGHT_DURATION_MS),
+  ];
+}
+
 function updateMusicButton() {
   const isPlaying = !elements.music.paused;
   elements.musicIcon.textContent = isPlaying ? "⏸" : "▶";
@@ -233,7 +271,7 @@ function reportLanguageAudioError(playback, reason) {
 
 async function playLanguageAudio(language, card) {
   stopLanguagePlayback({ restoreMusic: false });
-  playNoConfetti(card.querySelector(".speak-button"), language.word);
+  playPlaybackMoment(card, language.word);
 
   const audio = new Audio();
   audio.preload = "metadata";

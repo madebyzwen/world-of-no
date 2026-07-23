@@ -274,6 +274,15 @@ h2 {
   box-shadow: 0 0 0 0.2rem rgb(116 82 214 / 18%);
 }
 
+.language-card.is-celebrating {
+  z-index: 95;
+  animation: playback-card-lift 1100ms ease-out both;
+}
+
+.language-card.is-celebrating .word {
+  animation: playback-word-pulse 650ms ease-out 160ms both;
+}
+
 .card__top {
   display: flex;
   align-items: center;
@@ -472,6 +481,16 @@ footer a {
   pointer-events: none;
 }
 
+.playback-spotlight {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  background: #0f0b1c;
+  opacity: 0;
+  pointer-events: none;
+  animation: playback-spotlight 1100ms ease-out both;
+}
+
 .no-confetti__particle {
   position: absolute;
   font-weight: 900;
@@ -540,6 +559,50 @@ footer a {
 
   to {
     transform: translateX(var(--flutter-x)) rotate(var(--flutter-rotation));
+  }
+}
+
+@keyframes playback-spotlight {
+  0% {
+    opacity: 0;
+  }
+
+  14%,
+  50% {
+    opacity: 0.14;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes playback-card-lift {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  16%,
+  55% {
+    border-color: var(--accent);
+    box-shadow:
+      0 0 0 0.25rem rgb(215 38 120 / 24%),
+      0 1.2rem 2.8rem rgb(23 19 38 / 22%);
+    transform: translateY(-0.35rem) scale(1.02);
+  }
+}
+
+@keyframes playback-word-pulse {
+  0%,
+  100% {
+    color: var(--ink);
+    transform: scale(1);
+  }
+
+  45% {
+    color: var(--accent);
+    transform: scale(1.08);
   }
 }
 
