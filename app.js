@@ -369,7 +369,7 @@ elements.enterButton.addEventListener("click", () => {
   elements.musicToggle.disabled = false;
   elements.music.volume = selectedVolume;
   playMusic();
-  elements.search.focus();
+  elements.randomButton.focus({ preventScroll: true });
 });
 
 elements.musicToggle.addEventListener("click", () => {
