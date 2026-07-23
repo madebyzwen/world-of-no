@@ -338,6 +338,9 @@ function createCard(language) {
   speakButton.querySelector(".visually-hidden").textContent = accessibleLabel;
   speakButton.addEventListener("click", () => {
     randomSelectionToken += 1;
+    document
+      .querySelector(".language-card.is-highlighted")
+      ?.classList.remove("is-highlighted");
     playLanguageAudio(language, card);
   });
 
