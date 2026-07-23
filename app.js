@@ -1,6 +1,7 @@
 const DATA_URL = "./data/languages.json";
 const DUCKING_FACTOR = 0.2;
-const RANDOM_PLAYBACK_DELAY_MS = 500;
+const RANDOM_POST_SCROLL_DELAY_MS = 250;
+const RANDOM_SCROLL_TIMEOUT_MS = 2500;
 const NO_CONFETTI_COUNT = 50;
 const NO_CONFETTI_MAX_DURATION_MS = 2250;
 
@@ -43,6 +44,40 @@ const normalize = (value) =>
 
 const wait = (milliseconds) =>
   new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+
+function waitForScrollEnd() {
+  return new Promise((resolve) => {
+    const startTime = performance.now();
+    let previousX = window.scrollX;
+    let previousY = window.scrollY;
+    let stableFrames = 0;
+
+    function checkScroll(currentTime) {
+      const currentX = window.scrollX;
+      const currentY = window.scrollY;
+      const hasStopped =
+        Math.abs(currentX - previousX) < 0.5 &&
+        Math.abs(currentY - previousY) < 0.5;
+
+      stableFrames = hasStopped ? stableFrames + 1 : 0;
+      previousX = currentX;
+      previousY = currentY;
+
+      const elapsedTime = currentTime - startTime;
+      if (
+        (elapsedTime >= 150 && stableFrames >= 5) ||
+        elapsedTime >= RANDOM_SCROLL_TIMEOUT_MS
+      ) {
+        resolve();
+        return;
+      }
+
+      window.requestAnimationFrame(checkScroll);
+    }
+
+    window.requestAnimationFrame(checkScroll);
+  });
+}
 
 function showToast(message) {
   window.clearTimeout(toastTimer);
@@ -353,7 +388,8 @@ async function selectRandomLanguage() {
   card.classList.add("is-highlighted");
   card.focus({ preventScroll: true });
   card.scrollIntoView({ behavior: "smooth", block: "center" });
-  await wait(RANDOM_PLAYBACK_DELAY_MS);
+  await waitForScrollEnd();
+  await wait(RANDOM_POST_SCROLL_DELAY_MS);
 
   if (
     selectionToken !== randomSelectionToken ||
